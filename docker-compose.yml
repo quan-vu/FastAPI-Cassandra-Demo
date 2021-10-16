@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+
+  db_center_cassandra:
+    image: bitnami/cassandra:latest
+    ports: 
+      - 9042:9042
+    volumes:
+      - ./docker/dbdata/:/bitnami/cassandra/data
+
+  api:
+    image: "${COMPOSE_PROJECT_NAME}/api:1.0"
+    ports: 
+      - 8080:80
+    volumes: 
+      - ./src:/usr/src/app
+    depends_on: 
+      - db_center_cassandra
+    command: ["/wait-for-it.sh", "-t", "30", "db_center_cassandra:9042", "--", "/start.sh"]
